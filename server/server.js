@@ -3,7 +3,7 @@ const bodyParser = require('body-parser');
 
 const {mongoose} = require('./db/mongoose');
 const {Todo} = require('./modals/Todo');
-const {Users} = require('./modals/Users');
+const {User} = require('./modals/User');
 
 const app = express();
 
@@ -27,6 +27,19 @@ app.get('/todos',(req,res)=>{
     },(err)=>{
         res.status(400).send(err);
     })
+})
+
+app.get('/todo/:id',(req,res)=>{
+    const id = req.params.id;
+    Todo.findById(id).then((todo)=>{
+        if(!todo){
+            return res.status(404).send();
+        }
+        res.send({todo});
+    },(err)=>{
+        res.status(400).send();
+    })
+
 })
 
 
