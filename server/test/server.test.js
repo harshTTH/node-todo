@@ -3,11 +3,21 @@ const request = require('supertest');
 
 const {app} = require('../server');
 const {Todo} = require('../modals/Todo');
+const {ObjectID} = require('mongodb');
 
 const todos = [
-    {text:'go home'},
-    {text:'go school'},
-    {text:'come home'},
+    {
+        _id:new ObjectID(),
+        text:'go home',
+    },
+    {
+        text:'go school',
+        _id:new ObjectID()
+    },
+    {
+        text:'come home',
+        _id:new ObjectID()
+    },
 ];
 
 beforeEach((done)=>{
@@ -65,6 +75,31 @@ describe('GET /todos',()=>{
             expect(res.body.todos.length).toBe(3);
         })
         .end(done);
+    })
+})
+
+describe('GET /todo/:id',()=>{
+    it('should return todo doc',(done)=>{
+        request(app)
+        .get(`/todo/${todos[0]._id.toHexString()}`)
+        .expect(200)
+        .expect((res)=>{
+            expect(res.body.todo.text).toBe(todos[0].text)
+        })
+        .end(done)
+    })
+    it('should return 404 if todo not found',(done)=>{
+        const id = '5b1d655947df268ae7e9c5df';
+        request(app)
+        .get(`/todo/${id}`)
+        .expect(404)
+        .end(done)
+    })
+    it('should return 400 if todo id not valid',(done)=>{
+        request(app)
+        .get('/todo/123')
+        .expect(400)
+        .end(done)
     })
 })
 
